@@ -1,0 +1,404 @@
+/* Word Bites visual system: four complete, app-wide appearances. */
+.app {
+  --page-a: #fff7e9;
+  --page-b: #f2dfbf;
+  --surface: rgba(255, 250, 241, .94);
+  --surface-strong: #fffaf1;
+  --surface-soft: #f5e8d2;
+  --ink: #49301f;
+  --muted: #92775d;
+  --line: #e8d3b2;
+  --accent: #e6a52e;
+  --accent-deep: #a96517;
+  --accent-ink: #3b260e;
+  --tile: #fff9ed;
+  --tile-shadow: #cdb58f;
+  --glow: rgba(242, 177, 57, .28);
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse at 12% 9%, rgba(255,255,255,.85), transparent 29%),
+    radial-gradient(ellipse at 88% 28%, var(--glow), transparent 31%),
+    linear-gradient(155deg, var(--page-a), var(--page-b));
+  transition: background .35s ease, color .25s ease;
+}
+.app::before,
+.app::after {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(1px);
+}
+.app::before {
+  width: 230px;
+  height: 230px;
+  top: 12%;
+  left: -155px;
+  background: radial-gradient(circle, var(--glow), transparent 70%);
+}
+.app::after {
+  width: 280px;
+  height: 280px;
+  right: -190px;
+  bottom: 4%;
+  background: radial-gradient(circle, var(--glow), transparent 70%);
+}
+.app.theme-honey {
+  --page-a: #28150f;
+  --page-b: #100b09;
+  --surface: rgba(57, 31, 20, .96);
+  --surface-strong: #472719;
+  --surface-soft: #60351f;
+  --ink: #fff0d4;
+  --muted: #d2ad82;
+  --line: #8d542b;
+  --accent: #f6b936;
+  --accent-deep: #bd741b;
+  --accent-ink: #321908;
+  --tile: #754323;
+  --tile-shadow: #3b2014;
+  --glow: rgba(242, 151, 39, .27);
+}
+.app.theme-emerald {
+  --page-a: #092b24;
+  --page-b: #061713;
+  --surface: rgba(12, 53, 43, .96);
+  --surface-strong: #104637;
+  --surface-soft: #195a46;
+  --ink: #e9fff2;
+  --muted: #a2d1b6;
+  --line: #28785a;
+  --accent: #55d69a;
+  --accent-deep: #168456;
+  --accent-ink: #062b1b;
+  --tile: #176047;
+  --tile-shadow: #0b3829;
+  --glow: rgba(55, 216, 143, .25);
+}
+.app.theme-purple {
+  --page-a: #170d32;
+  --page-b: #080615;
+  --surface: rgba(31, 19, 57, .97);
+  --surface-strong: #29184c;
+  --surface-soft: #39215f;
+  --ink: #f7efff;
+  --muted: #c0addd;
+  --line: #6942a0;
+  --accent: #bd72ff;
+  --accent-deep: #7d35cb;
+  --accent-ink: #fff;
+  --tile: #39215f;
+  --tile-shadow: #1a1030;
+  --glow: rgba(159, 77, 255, .32);
+}
+.app.theme-honey .eyebrow,
+.app.theme-emerald .eyebrow,
+.app.theme-purple .eyebrow { color: var(--accent); }
+.app.theme-honey .tagline,
+.app.theme-emerald .tagline,
+.app.theme-purple .tagline,
+.app.theme-honey .offline-note,
+.app.theme-emerald .offline-note,
+.app.theme-purple .offline-note,
+.app.theme-honey .theme-note,
+.app.theme-emerald .theme-note,
+.app.theme-purple .theme-note { color: var(--muted); }
+.app.theme-honey .home-coins,
+.app.theme-emerald .home-coins,
+.app.theme-purple .home-coins,
+.app.theme-honey .play-card,
+.app.theme-emerald .play-card,
+.app.theme-purple .play-card,
+.app.theme-honey .world-card,
+.app.theme-emerald .world-card,
+.app.theme-purple .world-card,
+.app.theme-honey .achievement,
+.app.theme-emerald .achievement,
+.app.theme-purple .achievement,
+.app.theme-honey .account-card,
+.app.theme-emerald .account-card,
+.app.theme-purple .account-card,
+.app.theme-honey .cloud-card,
+.app.theme-emerald .cloud-card,
+.app.theme-purple .cloud-card,
+.app.theme-honey .setting-row,
+.app.theme-emerald .setting-row,
+.app.theme-purple .setting-row,
+.app.theme-honey .profile-card,
+.app.theme-emerald .profile-card,
+.app.theme-purple .profile-card,
+.app.theme-honey .stat-grid div,
+.app.theme-emerald .stat-grid div,
+.app.theme-purple .stat-grid div,
+.app.theme-honey .event-hero,
+.app.theme-emerald .event-hero,
+.app.theme-purple .event-hero,
+.app.theme-honey .dictionary-list button,
+.app.theme-emerald .dictionary-list button,
+.app.theme-purple .dictionary-list button,
+.app.theme-honey .dictionary-pop,
+.app.theme-emerald .dictionary-pop,
+.app.theme-purple .dictionary-pop,
+.app.theme-honey .complete-modal,
+.app.theme-emerald .complete-modal,
+.app.theme-purple .complete-modal,
+.app.theme-honey .onboard,
+.app.theme-emerald .onboard,
+.app.theme-purple .onboard {
+  color: var(--ink);
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: 0 12px 30px rgba(0,0,0,.16);
+}
+.app.theme-honey .home-grid button,
+.app.theme-emerald .home-grid button,
+.app.theme-purple .home-grid button,
+.app.theme-honey .icon-btn,
+.app.theme-emerald .icon-btn,
+.app.theme-purple .icon-btn {
+  color: var(--ink);
+  background: var(--surface-strong);
+  border-color: var(--line);
+}
+.app.theme-honey .primary,
+.app.theme-emerald .primary,
+.app.theme-purple .primary,
+.app.theme-honey .world-card button,
+.app.theme-emerald .world-card button,
+.app.theme-purple .world-card button,
+.app.theme-honey .account-card button,
+.app.theme-emerald .account-card button,
+.app.theme-purple .account-card button {
+  color: var(--accent-ink);
+  background: linear-gradient(145deg, var(--accent), var(--accent-deep));
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--accent-deep) 75%, #000);
+}
+.app.theme-purple .primary,
+.app.theme-purple .world-card button,
+.app.theme-purple .account-card button { color: #fff; }
+.app.theme-honey .letter,
+.app.theme-emerald .letter,
+.app.theme-purple .letter {
+  color: var(--ink);
+  background: linear-gradient(145deg, var(--tile), var(--surface-strong));
+  border: 1px solid var(--line);
+  box-shadow: 0 7px 0 var(--tile-shadow), 0 13px 25px rgba(0,0,0,.22), inset 0 2px 3px rgba(255,255,255,.15);
+}
+.app.theme-honey .letter.used,
+.app.theme-emerald .letter.used,
+.app.theme-purple .letter.used {
+  color: var(--accent-ink);
+  background: linear-gradient(145deg, var(--accent), var(--accent-deep));
+}
+.app.theme-purple .letter.used { color: #fff; }
+.app.theme-honey .word-slot,
+.app.theme-emerald .word-slot,
+.app.theme-purple .word-slot { color: var(--muted); border-bottom-color: var(--line); }
+.app.theme-honey .word-slot.found,
+.app.theme-emerald .word-slot.found,
+.app.theme-purple .word-slot.found { color: var(--ink); border-bottom-color: var(--accent); }
+.app.theme-honey .tool-row button,
+.app.theme-emerald .tool-row button,
+.app.theme-purple .tool-row button,
+.app.theme-honey .word-lengths span,
+.app.theme-emerald .word-lengths span,
+.app.theme-purple .word-lengths span,
+.app.theme-honey .challenge-btn,
+.app.theme-emerald .challenge-btn,
+.app.theme-purple .challenge-btn {
+  color: var(--ink);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+}
+.app.theme-honey .challenge-btn,
+.app.theme-emerald .challenge-btn,
+.app.theme-purple .challenge-btn { color: var(--accent); }
+.app.theme-honey .progress-bar,
+.app.theme-emerald .progress-bar,
+.app.theme-purple .progress-bar,
+.app.theme-honey .event-progress,
+.app.theme-emerald .event-progress,
+.app.theme-purple .event-progress { background: var(--surface-soft); }
+.app.theme-honey .progress-bar i,
+.app.theme-emerald .progress-bar i,
+.app.theme-purple .progress-bar i,
+.app.theme-honey .event-progress i,
+.app.theme-emerald .event-progress i { background: linear-gradient(90deg, var(--accent-deep), var(--accent)); }
+.app.theme-purple .event-progress i { background: linear-gradient(90deg, #8736d6, #d38aff); }
+.app.theme-honey .sub-nav,
+.app.theme-emerald .sub-nav,
+.app.theme-purple .sub-nav { background: var(--page-a); border-color: var(--line); }
+.app.theme-honey .sub-nav h2,
+.app.theme-emerald .sub-nav h2,
+.app.theme-purple .sub-nav h2,
+.app.theme-honey .game-title-row h2,
+.app.theme-emerald .game-title-row h2,
+.app.theme-purple .game-title-row h2 { color: var(--ink); }
+.app.theme-honey .game-head small,
+.app.theme-emerald .game-head small,
+.app.theme-purple .game-head small,
+.app.theme-honey .clue,
+.app.theme-emerald .clue,
+.app.theme-purple .clue,
+.app.theme-honey .bonus-line,
+.app.theme-emerald .bonus-line,
+.app.theme-purple .bonus-line,
+.app.theme-honey .dictionary-intro,
+.app.theme-emerald .dictionary-intro,
+.app.theme-purple .dictionary-intro { color: var(--muted); }
+.app.theme-honey .coin-chip,
+.app.theme-emerald .coin-chip,
+.app.theme-purple .coin-chip { color: var(--accent-ink); background: var(--accent); border-color: var(--line); }
+.app.theme-purple .coin-chip { color: #fff; }
+.app.theme-honey .theme-card,
+.app.theme-emerald .theme-card,
+.app.theme-purple .theme-card {
+  color: var(--ink);
+  background: linear-gradient(145deg, var(--surface-strong), var(--surface));
+  border-color: var(--line);
+}
+.app.theme-honey .theme-card small,
+.app.theme-emerald .theme-card small,
+.app.theme-purple .theme-card small { color: var(--accent); }
+.app.theme-honey .theme-card em,
+.app.theme-emerald .theme-card em,
+.app.theme-purple .theme-card em { color: var(--muted); }
+.app.theme-honey .theme-card.active,
+.app.theme-emerald .theme-card.active,
+.app.theme-purple .theme-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--glow), 0 14px 30px rgba(0,0,0,.25);
+}
+.app.theme-honey .modal-x,
+.app.theme-emerald .modal-x,
+.app.theme-purple .modal-x,
+.app.theme-honey .dictionary-pop button,
+.app.theme-emerald .dictionary-pop button,
+.app.theme-purple .dictionary-pop button { color: var(--ink); background: var(--surface-soft); }
+.app.theme-honey .tutorial div,
+.app.theme-emerald .tutorial div,
+.app.theme-purple .tutorial div { background: var(--surface-soft); }
+.app.theme-honey .tutorial small,
+.app.theme-emerald .tutorial small,
+.app.theme-purple .tutorial small,
+.app.theme-honey .stat-grid span,
+.app.theme-emerald .stat-grid span,
+.app.theme-purple .stat-grid span,
+.app.theme-honey .world-card small,
+.app.theme-emerald .world-card small,
+.app.theme-purple .world-card small,
+.app.theme-honey .achievement small,
+.app.theme-emerald .achievement small,
+.app.theme-purple .achievement small { color: var(--muted); }
+.app.theme-honey .achievement.earned,
+.app.theme-emerald .achievement.earned,
+.app.theme-purple .achievement.earned { background: var(--surface-soft); border-color: var(--accent); }
+.app.theme-honey .danger-btn,
+.app.theme-emerald .danger-btn,
+.app.theme-purple .danger-btn { background: #6b2c36; color: #ffe8eb; }
+.app.theme-honey .mechanic-banner,
+.app.theme-emerald .mechanic-banner,
+.app.theme-purple .mechanic-banner { color: var(--accent); background: var(--surface-soft); }
+.app.theme-honey .path polyline,
+.app.theme-emerald .path polyline,
+.app.theme-purple .path polyline { stroke: var(--accent); }
+.app.theme-honey .mascot,
+.app.theme-emerald .mascot,
+.app.theme-purple .mascot {
+  border: 3px solid var(--accent);
+  box-shadow: inset -9px -10px rgba(0,0,0,.18), 0 0 0 5px var(--glow), 0 15px 30px rgba(0,0,0,.25);
+}
+.app.theme-honey .home-screen,
+.app.theme-emerald .home-screen,
+.app.theme-purple .home-screen { position: relative; }
+.app.theme-honey .home-screen::before,
+.app.theme-emerald .home-screen::before,
+.app.theme-purple .home-screen::before {
+  content: '✦  🍪  ✦';
+  display: block;
+  position: absolute;
+  top: 170px;
+  right: 8px;
+  color: var(--accent);
+  opacity: .2;
+  font-size: 30px;
+  pointer-events: none;
+}
+.app.theme-honey .home-grid button,
+.app.theme-emerald .home-grid button,
+.app.theme-purple .home-grid button {
+  box-shadow: inset 0 1px rgba(255,255,255,.12), 0 7px 18px rgba(0,0,0,.15);
+}
+.app.theme-honey .primary.big,
+.app.theme-emerald .primary.big,
+.app.theme-purple .primary.big {
+  border-radius: 20px;
+  text-shadow: 0 1px 1px rgba(0,0,0,.2);
+  box-shadow: 0 7px 0 color-mix(in srgb, var(--accent-deep) 75%, #000), 0 15px 28px var(--glow), inset 0 2px rgba(255,255,255,.35);
+}
+.app.theme-honey .play-card,
+.app.theme-emerald .play-card,
+.app.theme-purple .play-card { backdrop-filter: blur(12px); }
+.app.theme-honey .brand-logo,
+.app.theme-emerald .brand-logo,
+.app.theme-purple .brand-logo { box-shadow: 0 18px 45px rgba(0,0,0,.28), 0 0 24px var(--glow); }
+.app.theme-classic .theme-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--glow), 0 10px 24px rgba(89,65,30,.14);
+}
+.app button { transition: transform .16s ease, box-shadow .2s ease, background .25s ease, border-color .2s ease; }
+.app button:active { transform: translateY(1px) scale(.985); }
+.app button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.app .theme-card { min-height: 158px; border-radius: 21px; }
+.app .theme-card span { filter: drop-shadow(0 4px 4px rgba(0,0,0,.18)); }
+.app .home-grid button { min-height: 86px; justify-content: center; }
+.app .primary { background-image: linear-gradient(145deg, #6c5840, #3b3025); }
+.app .word-slot.found { font-weight: 1000; }
+.app .letter { transition: transform .12s ease, background .25s ease, box-shadow .2s ease; }
+.app .letter.golden { outline-color: var(--accent); }
+.app .home-coins { color: var(--ink); background: var(--surface); border-color: var(--line); }
+.app .game-screen, .app .sub-screen { color: var(--ink); }
+
+/* Bakery illustration and premium game-surface refinement */
+.app .home-screen { position: relative; overflow: hidden; }
+.app .bakery-hero-art { position: relative; width: min(100%, 560px); height: clamp(150px, 42vw, 245px); margin: 0 auto -6px; display: grid; place-items: center; pointer-events: none; }
+.app .bakery-hero-art img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 15px 20px rgba(57,31,12,.16)); animation: bakeryFloat 5s ease-in-out infinite; }
+.app .floating-spark { position: absolute; color: var(--accent); font-size: 26px; text-shadow: 0 0 18px var(--glow); animation: sparkPulse 2.4s ease-in-out infinite; }
+.app .spark-one { top: 16%; left: 17%; }
+.app .spark-two { top: 30%; right: 15%; animation-delay: .8s; }
+.app .brand-logo { position: relative; z-index: 1; }
+.app .play-card { position: relative; overflow: hidden; border-radius: 30px; }
+.app .game-card-decoration { position: absolute; top: 0; right: 8px; width: 116px; height: 52px; opacity: .22; pointer-events: none; }
+.app .game-card-decoration img { width: 100%; height: 100%; object-fit: contain; }
+.app .current-word { position: relative; z-index: 1; text-shadow: 0 2px 15px var(--glow); }
+.app .letter { border-width: 2px; font-weight: 1000; text-shadow: 0 1px rgba(255,255,255,.25); }
+.app .letter.used { transform: translate(-50%,-50%) scale(1.07); }
+.app .tool-row button { min-height: 62px; border-radius: 16px; box-shadow: inset 0 1px rgba(255,255,255,.35), 0 5px 12px rgba(0,0,0,.07); }
+.app .challenge-btn { min-height: 43px; border-radius: 15px; box-shadow: 0 5px 12px var(--glow); }
+.app .home-grid button { border-radius: 19px; min-height: 92px; box-shadow: 0 8px 18px rgba(73,48,31,.08), inset 0 1px rgba(255,255,255,.6); }
+.app .home-grid button svg { width: 23px; height: 23px; }
+.app .home-coins { box-shadow: 0 7px 18px rgba(73,48,31,.08), inset 0 1px rgba(255,255,255,.5); }
+.app .theme-preview-icon { width: 50px; height: 50px; display: grid; place-items: center; border-radius: 16px; background: linear-gradient(145deg,var(--surface-soft),var(--surface-strong)); box-shadow: inset 0 1px rgba(255,255,255,.25), 0 7px 14px rgba(0,0,0,.14); }
+.app.theme-classic .theme-card.theme-honey .theme-preview-icon { background: linear-gradient(145deg,#f6b936,#754323); }
+.app.theme-classic .theme-card.theme-emerald .theme-preview-icon { background: linear-gradient(145deg,#55d69a,#092b24); }
+.app.theme-classic .theme-card.theme-purple .theme-preview-icon { background: linear-gradient(145deg,#bd72ff,#170d32); }
+.app .theme-card { box-shadow: 0 9px 20px rgba(0,0,0,.09), inset 0 1px rgba(255,255,255,.24); }
+.app .theme-card.active { transform: translateY(-2px); }
+.app .sub-nav { backdrop-filter: blur(14px); }
+.app .world-card, .app .achievement, .app .stat-grid div, .app .event-hero, .app .profile-card { border-radius: 20px; box-shadow: 0 9px 22px rgba(0,0,0,.08), inset 0 1px rgba(255,255,255,.2); }
+.app.theme-classic .play-card { background: linear-gradient(145deg,rgba(255,252,246,.97),rgba(248,235,214,.93)); }
+.app.theme-honey .play-card { background: linear-gradient(145deg,#57301f,#351c15); }
+.app.theme-emerald .play-card { background: linear-gradient(145deg,#14523f,#0a3027); }
+.app.theme-purple .play-card { background: linear-gradient(145deg,#35205a,#1b1034); }
+@keyframes bakeryFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes sparkPulse { 0%,100% { opacity: .45; transform: scale(.85) rotate(-8deg); } 50% { opacity: 1; transform: scale(1.12) rotate(8deg); } }
+@media (max-width: 500px) {
+  .app .home-screen { padding-top: 20px; }
+  .app .theme-grid { gap: 9px; }
+  .app .theme-card { min-height: 148px; padding: 13px; }
+}

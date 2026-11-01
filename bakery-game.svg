@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 100" fill="none">
+<defs><linearGradient id="cookie" x1="20" y1="10" x2="100" y2="90"><stop stop-color="#F4C77D"/><stop offset="1" stop-color="#B66B32"/></linearGradient></defs>
+<g opacity=".9"><path d="M28 50c0-21 17-38 38-38 7 0 13 2 18 5-5 13 3 25 17 27 1 23-16 42-39 42S28 72 28 50Z" fill="url(#cookie)" stroke="#925329" stroke-width="5"/><g fill="#714329"><circle cx="53" cy="39" r="5"/><circle cx="76" cy="61" r="6"/><circle cx="51" cy="66" r="4"/></g></g>
+<g transform="translate(150 8)"><path d="M8 45h100l-12 43H20L8 45Z" fill="#D98A9E" stroke="#A84D68" stroke-width="5"/><path d="M5 45c-9-15 7-27 20-20 5-20 31-23 41-6 14-17 39-8 37 11 17 1 22 17 5 25H15L5 45Z" fill="#FFF0E5" stroke="#D6A5A5" stroke-width="5"/><path d="m55 11 5-9m19 17 9-7" stroke="#E5A23A" stroke-width="6" stroke-linecap="round"/></g>
+<g transform="translate(310 18)"><path d="M4 42c0-20 16-36 36-36s36 16 36 36-16 36-36 36S4 62 4 42Z" fill="#D99B48" stroke="#995B2D" stroke-width="5"/><circle cx="40" cy="42" r="14" fill="#F7E5C8"/><path d="M20 17c12 8 28 8 41 0" stroke="#FBE5B9" stroke-width="5" stroke-linecap="round"/></g>
+</svg>

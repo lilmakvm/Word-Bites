@@ -1,0 +1,121 @@
+[
+  {
+    "name": "Start Word Bites and verify the installable app shell",
+    "sanity": true,
+    "viewport": "mobile",
+    "covers": [
+      "logo and app branding",
+      "onboarding",
+      "swipe-to-spell",
+      "release-to-submit",
+      "mobile gameplay",
+      "PWA manifest",
+      "service worker registration",
+      "offline app shell"
+    ],
+    "description": "Verifies the primary mobile gameplay flow and that the deployed app exposes its installable PWA shell.",
+    "steps": [
+      "Open Word Bites with fresh local progress",
+      "Dismiss onboarding and enter the first level",
+      "Drag across letters and release",
+      "Inspect the browser install option and then reload with the network unavailable"
+    ],
+    "expected": "Gameplay remains usable, the PWA manifest and service worker load, and the cached app shell opens offline."
+  },
+  {
+    "name": "Automatically advance after completing a puzzle and resume saved progress",
+    "viewport": "mobile",
+    "covers": [
+      "level completion",
+      "progressive difficulty from Normal through Expert and higher mastery tiers",
+      "increasing letter-pool complexity and randomized starting wheel positions",
+      "difficulty-scaled hint costs and shorter advanced timed challenges",
+      "automatic next-puzzle transition",
+      "resume unfinished puzzle",
+      "saved solved words",
+      "persistent level progression",
+      "completion rewards"
+    ],
+    "description": "Verifies that completing every required word automatically opens the next puzzle and Play resumes the last active puzzle with its found words intact after reopening.",
+    "steps": [
+      "Start a puzzle and find one or more required words without completing it",
+      "Close or reload Word Bites",
+      "Tap Play and verify the same puzzle and found words are restored",
+      "Complete all remaining required words and verify the next level is harder than the previous one",
+      "Advance through Normal, Tricky, Hard, Expert, Master, Grandmaster, and Legend milestones and verify letter pools and hint costs increase",
+      "Wait for the short completion transition without tapping a next button",
+      "Return home and tap Play again"
+    ],
+    "expected":       "Play restores the last active puzzle and its found words; each completion advances automatically through progressively harder tiers from Normal to Tricky, Hard, Expert, Master, Grandmaster, and Legend, with more letter complexity, randomized wheel positions, and increasingly costly hints."
+  },
+  {
+    "name": "Recover safely from malformed or unavailable local progress",
+    "viewport": "mobile",
+    "covers": [
+      "localStorage validation",
+      "progress recovery",
+      "resume-level bounds protection",
+      "level bounds protection",
+      "safe persistence"
+    ],
+    "description": "Verifies invalid saved progress cannot crash the app or produce an unusable level.",
+    "steps": [
+      "Open Word Bites with saved progress containing invalid or out-of-range level and resume values",
+      "Navigate to gameplay",
+      "Complete or leave the level"
+    ],
+    "expected": "Word Bites normalizes invalid saved values, opens a valid level, and remains usable without a blank screen."
+  },
+  {
+    "name": "Use themes, settings, navigation, and recovery controls",
+    "viewport": "mobile",
+    "covers": [
+      "four-theme selection",
+      "app-wide theme palette changes",
+      "bakery hero illustration and polished game surfaces",
+      "purple dark mode",
+      "theme persistence across reload",
+      "back navigation",
+      "settings",
+      "dictionary",
+      "achievements",
+      "events",
+      "updated how-to-play instructions"
+    ],
+    "description": "Verifies secondary screens remain navigable and state changes do not destabilize the app.",
+    "steps": [
+      "Open Themes and select Honey Gold, Emerald Green, Electric Purple, and Light Mode in turn",
+      "Verify Purple is the dark appearance and each selection recolours cards, buttons, game tiles, and navigation",
+      "Inspect the bakery hero illustration, decorative game-card art, polished letter tiles, and theme preview swatches",
+      "Open Settings and change text size",
+      "Open How to Play, then use back navigation and visit Profile, Dictionary, Achievements, and Events"
+    ],
+    "expected": "Each appearance applies across all screens, Electric Purple provides the dark palette, the selected appearance persists after reload, and navigation remains usable."
+  },
+  {
+    "name": "Handle gameplay edge cases and daily completion safely",
+    "viewport": "desktop",
+    "covers": [
+      "rapid input",
+      "shuffle",
+      "shuffle-aware letter-to-position mapping",
+      "selection-path alignment after shuffle",
+      "drag reset after shuffle",
+      "hints",
+      "timed challenge",
+      "duplicate words",
+      "invalid words",
+      "timer cleanup",
+      "daily puzzle completion",
+      "daily reward-once protection"
+    ],
+    "description": "Verifies common gameplay actions and ensures a completed daily puzzle cannot repeatedly award completion rewards.",
+    "steps": [
+      "Rapidly select and release letters several times",
+      "Use Shuffle repeatedly during a normal level, then drag across the newly positioned letters to form and submit a word",
+      "Use hints during a normal level",
+      "Complete the daily puzzle and return to it again on the same day"
+    ],
+    "expected": "After every shuffle, the selection line follows the letters' current displayed positions, the old drag path is cleared, and words can still be formed and submitted; timers stop when leaving timed play, and the daily completion reward is granted only once per day."
+  }
+]
