@@ -385,10 +385,49 @@ function App(){
   const Profile=()=> <div className="sub-screen"><Nav title="Profile & Stats"/><div className="profile-card">{mascot('👨‍🍳')}<h2>Word Bites Player</h2><p>Level {p.level+1} · 🔥 {p.streak} day streak</p></div><div className="stat-grid">{[['Levels',p.completed.length],['Words',p.wordsFound],['Bonus',p.bonus.length],['Longest',p.longest||'—'],['Best streak',p.bestStreak],['Coins',p.coins],['Perfect',p.perfect],['Event',p.eventWords]].map(([a,b])=><div key={String(a)}><b>{b}</b><span>{a}</span></div>)}</div><div className="account-card">☁️ <b>Word Bites Account</b><small>Level {p.level+1} · ⭐ {Object.values(p.stars).reduce((a,b)=>a+b,0)} · 🔥 {p.streak} · 🪙 {p.coins}</small><button onClick={()=>setMessage('Cloud accounts will preserve this profile across devices when enabled.')}>Cloud sync</button></div></div>;
   const Achievements=()=> <div className="sub-screen"><Nav title="Achievements"/>{[['🏆','First Word','Find your first word'],['🔥','10-Day Streak','Play 10 days in a row'],['🧠','100 Words Found','Discover 100 words'],['💎','50 Bonus Words','Find 50 bonus words'],['👑','Complete 100 Levels','Master 100 levels'],['⭐','Perfect Level','Finish with 3 stars'],['🎯','No Mistakes','Finish a puzzle with no invalid words']].map(([icon,name,desc])=><div className={'achievement '+(p.achievements.includes(name)|| (name==='No Mistakes'&&p.noMistakes>0)?'earned':'')} key={name}><span>{icon}</span><div><b>{name}</b><small>{desc}</small></div><span>{p.achievements.includes(name)||(name==='No Mistakes'&&p.noMistakes>0)?'✓':'🔒'}</span></div>)}</div>;
   const Dictionary=()=> <div className="sub-screen"><Nav title="Word Dictionary"/><div className="dictionary-intro">Tap discovered words during a puzzle to review them here.</div><div className="dictionary-list">{[...new Set(p.solved.map(x=>x.split(':')[1]).concat(p.bonus.map(x=>x.split(':')[1])))].slice(-80).reverse().map(w=><button key={w} onClick={()=>setDictionaryWord(w)}><b>{w}</b><small>{w.length} letters · discovered</small></button>)}</div>{dictionaryWord&&<div className="dictionary-pop"><button onClick={()=>setDictionaryWord('')}><X/></button><b>{dictionaryWord}</b><small>{dictionaryWord.length>=5?'Noun / verb — a discovered word worth remembering.':'Common word — keep exploring related forms.'}</small></div>}</div>;
-  const Event=()=>{const goal=eventGoal();const progress=Math.min(goal,p.eventWords);return <div className="sub-screen"><Nav title="Word Bites Events"/><div className="event-hero"><div>🍪</div><p className="eyebrow">WEEKEND BAKE-OFF</p><h2>Find {goal} words this event.</h2><div className="event-progress"><i style={{width:progress/goal*100+'%'}}/></div><b>{progress}/{goal}</b><p>Reward: 🪙 500 Coins + 🏅 Special Badge</p>{progress>=goal?<button className="primary big" onClick={()=>{if(!p.achievements.includes('Weekend Bake-Off'))commit({coins:p.coins+500,achievements:[...p.achievements,'Weekend Bake-Off']});}}>Claim reward</button>:<button className="primary big" onClick={()=>begin(p.level)}>Bake words</button>}</div></div>};
+    const Event=()=>{
+    const goal=eventGoal();
+    const progress=Math.min(goal,p.eventWords);
 
+    return (
+      <div className="sub-screen">
+        <Nav title="Word Bites Events"/>
+        <div className="event-hero">
+          <div>🍪</div>
+          <p className="eyebrow">WEEKEND BAKE-OFF</p>
+          <h2>Find {goal} words this event.</h2>
+          <div className="event-progress">
+            <i style={{width:progress/goal*100+'%'}}/>
+          </div>
+          <b>{progress}/{goal}</b>
+          <p>Reward: 🪙 500 Coins + 🏅 Special Badge</p>
+          {progress>=goal ? (
+            <button className="primary big" onClick={()=>{
+              if(!p.achievements.includes('Weekend Bake-Off')){
+                commit({coins:p.coins+500,achievements:[...p.achievements,'Weekend Bake-Off']});
+              }
+            }}>Claim reward</button>
+          ) : (
+            <button className="primary big" onClick={()=>begin(p.level)}>Bake words</button>
+          )}
+        </div>
+      </div>
+    );
+  };
 
-
-  
+  return (
+    <div className={themeClass}>
+      {screen==='home' && <HomeScreen/>}
+      {(screen==='game'||screen==='daily') && <GameScreen/>}
+      {screen==='settings' && <SettingsScreen/>}
+      {screen==='themes' && <Themes/>}
+      {screen==='worlds' && <Worlds/>}
+      {screen==='profile' && <Profile/>}
+      {screen==='achievements' && <Achievements/>}
+      {screen==='dictionary' && <Dictionary/>}
+      {screen==='event' && <Event/>}
+    </div>
+  );
 }
+
 export default App;
