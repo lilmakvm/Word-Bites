@@ -37,6 +37,47 @@ jobs:
       - name: Sync app into Android project
         run: npx cap sync android
 
+      - name: Install image processing tool
+        run: npm install --no-save sharp
+
+      - name: Generate Word Bites launcher icons
+        run: |
+          node --input-type=module <<'NODE'
+          import sharp from 'sharp';
+          import fs from 'node:fs';
+
+          const source = 'public/resources/word-bites-icon.png';
+
+          if (!fs.existsSync(source)) {
+            throw new Error(`Icon not found: ${source}`);
+          }
+
+          const densities = {
+            'mipmap-mdpi': 48,
+            'mipmap-hdpi': 72,
+            'mipmap-xhdpi': 96,
+            'mipmap-xxhdpi': 144,
+            'mipmap-xxxhdpi': 192
+          };
+
+          for (const [folder, size] of Object.entries(densities)) {
+            const dir = `android/app/src/main/res/${folder}`;
+            fs.mkdirSync(dir, { recursive: true });
+
+            for (const name of ['ic_launcher', 'ic_launcher_round']) {
+              await sharp(source)
+                .resize(size, size, {
+                  fit: 'contain',
+                  background: { r: 255, g: 255, b: 255, alpha: 0 }
+                })
+                .png()
+                .toFile(`${dir}/${name}.png`);
+            }
+          }
+
+          console.log('Word Bites launcher icons generated.');
+          NODE
+
       - name: Build installable debug APK
         working-directory: android
         run: ./gradlew assembleDebug
