@@ -40,7 +40,7 @@ jobs:
       - name: Install image processing tool
         run: npm install --no-save sharp
 
-      - name: Generate Word Bites launcher icons
+      - name: Generate all Word Bites launcher icons
         run: |
           node --input-type=module <<'NODE'
           import sharp from 'sharp';
@@ -60,22 +60,83 @@ jobs:
             'mipmap-xxxhdpi': 192
           };
 
+          // Generate standard launcher icons.
           for (const [folder, size] of Object.entries(densities)) {
             const dir = `android/app/src/main/res/${folder}`;
             fs.mkdirSync(dir, { recursive: true });
 
             for (const name of ['ic_launcher', 'ic_launcher_round']) {
               await sharp(source)
-                .resize(size, size, {
-                  fit: 'contain',
-                  background: { r: 255, g: 255, b: 255, alpha: 0 }
-                })
+                .resize(size, size, { fit: 'contain' })
                 .png()
                 .toFile(`${dir}/${name}.png`);
             }
           }
 
-          console.log('Word Bites launcher icons generated.');
+          // Generate the adaptive icon foreground.
+          const foregroundDir =
+            'android/app/src/main/res/drawable-nodpi';
+
+          fs.mkdirSync(foregroundDir, { recursive: true });
+
+          const iconBuffer = await sharp(source)
+            .resize(264, 264, { fit: 'contain' })
+            .png()
+            .toBuffer();
+
+          await sharp({
+            create: {
+              width: 432,
+              height: 432,
+              channels: 4,
+              background: {
+                r: 0,
+                g: 0,
+                b: 0,
+                alpha: 0
+              }
+            }
+          })
+            .composite([{ input: iconBuffer, gravity: 'centre' }])
+            .png()
+            .toFile(
+              `${foregroundDir}/word_bites_launcher_foreground.png`
+            );
+
+          // Generate adaptive icon background color.
+          const valuesDir = 'android/app/src/main/res/values';
+          fs.mkdirSync(valuesDir, { recursive: true });
+
+          fs.writeFileSync(
+            `${valuesDir}/word_bites_launcher.xml`,
+            `<resources>
+              <color name="word_bites_launcher_background">#FFFFFF</color>
+            </resources>`
+          );
+
+          // Replace Android adaptive launcher icon definitions.
+          const adaptiveDir =
+            'android/app/src/main/res/mipmap-anydpi-v26';
+
+          fs.mkdirSync(adaptiveDir, { recursive: true });
+
+          const adaptiveXml = `<?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/word_bites_launcher_background"/>
+              <foreground android:drawable="@drawable/word_bites_launcher_foreground"/>
+          </adaptive-icon>`;
+
+          fs.writeFileSync(
+            `${adaptiveDir}/ic_launcher.xml`,
+            adaptiveXml
+          );
+
+          fs.writeFileSync(
+            `${adaptiveDir}/ic_launcher_round.xml`,
+            adaptiveXml
+          );
+
+          console.log('All Word Bites launcher icons generated.');
           NODE
 
       - name: Build installable debug APK
