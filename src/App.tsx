@@ -267,7 +267,128 @@ function App(){
   const Dictionary=()=> <div className="sub-screen"><Nav title="Word Dictionary"/><div className="dictionary-intro">Tap discovered words during a puzzle to review them here.</div><div className="dictionary-list">{[...new Set(p.solved.map(x=>x.split(':')[1]).concat(p.bonus.map(x=>x.split(':')[1])))].slice(-80).reverse().map(w=><button key={w} onClick={()=>setDictionaryWord(w)}><b>{w}</b><small>{w.length} letters · discovered</small></button>)}</div>{dictionaryWord&&<div className="dictionary-pop"><button onClick={()=>setDictionaryWord('')}><X/></button><b>{dictionaryWord}</b><small>{dictionaryWord.length>=5?'Noun / verb — a discovered word worth remembering.':'Common word — keep exploring related forms.'}</small></div>}</div>;
   const Event=()=>{const goal=eventGoal();const progress=Math.min(goal,p.eventWords);return <div className="sub-screen"><Nav title="Word Bites Events"/><div className="event-hero"><div>🍪</div><p className="eyebrow">WEEKEND BAKE-OFF</p><h2>Find {goal} words this event.</h2><div className="event-progress"><i style={{width:progress/goal*100+'%'}}/></div><b>{progress}/{goal}</b><p>Reward: 🪙 500 Coins + 🏅 Special Badge</p>{progress>=goal?<button className="primary big" onClick={()=>{if(!p.achievements.includes('Weekend Bake-Off'))commit({coins:p.coins+500,achievements:[...p.achievements,'Weekend Bake-Off']});}}>Claim reward</button>:<button className="primary big" onClick={()=>begin(p.level)}>Bake words</button>}</div></div>};
 
-  const content=screen==='home'?<HomeScreen/>:screen==='game'||screen==='daily'?<GameScreen/>:screen==='worlds'?<Worlds/>:screen==='profile'?<Profile/>:screen==='achievements'?<Achievements/>:screen==='settings'?<SettingsScreen/>:screen==='themes'?<Themes/>:screen==='dictionary'?<Dictionary/>:<Event/>;
-  return <main className={'app '+themeClass+' text-'+p.settings.textSize} data-theme={activeTheme}>{content}</main>;
+
+const SettingsScreen=()=> (
+  <div className="sub-screen">
+    <Nav title="Settings"/>
+
+    <section className="settings-list">
+
+      <SettingRow
+        icon={p.settings.muted?<VolumeX/>:<Volume2/>}
+        label="Sound"
+        value={!p.settings.muted}
+        onClick={()=>commit({
+          settings:{...p.settings,muted:!p.settings.muted}
+        })}
+      />
+
+      <SettingRow
+        icon={<Zap/>}
+        label="Haptics"
+        value={p.settings.haptics}
+        onClick={()=>commit({
+          settings:{...p.settings,haptics:!p.settings.haptics}
+        })}
+      />
+
+      <button className="setting-row" onClick={()=>setScreen('themes')}>
+        <span><Sparkles/> Appearance & themes</span>
+        <b>{p.theme==='purple'?'PURPLE DARK':p.theme.toUpperCase()}</b>
+      </button>
+
+      <div className="setting-row">
+        <span>🔤 Text size</span>
+        <select
+          value={p.settings.textSize}
+          onChange={e=>commit({
+            settings:{
+              ...p.settings,
+              textSize:e.target.value as SettingsState['textSize']
+            }
+          })}
+        >
+          <option value="small">Small</option>
+          <option value="normal">Normal</option>
+          <option value="large">Large</option>
+        </select>
+      </div>
+
+      <button className="wide-btn" onClick={()=>setScreen('themes')}>
+        🎨 Theme
+      </button>
+
+      <button
+        className="wide-btn"
+        onClick={()=>alert(
+          'Swipe across letters and release your finger to automatically check the word. Find every normal word for 3 stars.'
+        )}
+      >
+        ❓ How to play
+      </button>
+
+      <button
+        className="danger-btn"
+        onClick={()=>{
+          if(confirm('Reset all local progress?')){
+            localStorage.removeItem('word-bites-progress');
+            location.reload();
+          }
+        }}
+      >
+        🔄 Reset progress
+      </button>
+
+    </section>
+
+    <div className="offline-note">
+      📴 Offline-first: progress, coins, stars, settings and daily state
+      are saved on this device.
+    </div>
+
+    <div className="cloud-card">
+      ☁️ <b>Word Bites Account</b>
+      <small>
+        Cross-device cloud sync is prepared for a future account service.
+        Your local progress remains safe meanwhile.
+      </small>
+    </div>
+
+    <div className="cloud-card" style={{textAlign:'center',padding:'24px'}}>
+      <img
+        src="/resources/word-bites-icon.png"
+        alt="Word Bites icon"
+        style={{
+          width:'90px',
+          height:'90px',
+          objectFit:'contain',
+          display:'block',
+          margin:'0 auto 16px'
+        }}
+      />
+
+      <h2>WORD BITES</h2>
+
+      <p>
+        A fun and challenging word puzzle game designed
+        to test your vocabulary, thinking and creativity.
+      </p>
+
+      <div style={{marginTop:'20px'}}>
+        <small>CREATED AND DEVELOPED BY</small>
+        <h2 style={{letterSpacing:'2px'}}>
+          LILMA STUDIOS
+        </h2>
+      </div>
+
+      <small>Version 1.1.0</small>
+
+      <p style={{fontSize:'12px',opacity:0.7}}>
+        © 2026 Lilma Studios. All rights reserved.
+      </p>
+    </div>
+  </div>
+);
+  
 }
 export default App;
