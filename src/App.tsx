@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Award, BookOpen, CalendarDays, ChevronLeft, ChevronRight, CircleHelp, Flame, Gift, Home, Lightbulb, Medal, Moon, RotateCcw, Settings, Shuffle, Sparkles, Star, Sun, Trophy, UserRound, Volume2, VolumeX, X, Zap } from 'lucide-react';
+import { supabase } from './lib/supabase';
 
 type Mechanic = 'classic'|'locked'|'frozen'|'countdown'|'multiplier'|'streak';
 type Level = { letters: string[]; words: string[]; bonus: string[]; mystery: string; golden: number; difficulty: string; world: string; mechanic: Mechanic; specialIndex: number; timeLimit: number };
