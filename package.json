@@ -13,7 +13,7 @@
     "ios:sync": "npm run build && cap sync ios",
     "ios:open": "cap open ios"
   },
-  "dependencies": {
+  "@supabase/supabase-js": "^2"{
     "@capacitor/android": "^7.4.3",
     "@capacitor/core": "^7.4.3",
     "@capacitor/ios": "^7.4.3",
