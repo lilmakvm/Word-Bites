@@ -107,6 +107,9 @@ function related(a:string,b:string){ return a.length>2 && b.length>2 && (a.inclu
 
 function App(){
   const [p,setP] = useState<Progress>(load);
+  const [cloudUser,setCloudUser] = useState<any>(null);
+const [cloudReady,setCloudReady] = useState(false);
+const [cloudStatus,setCloudStatus] = useState('Connecting...');
   const [screen,setScreen] = useState<'home'|'game'|'daily'|'worlds'|'profile'|'achievements'|'settings'|'themes'|'dictionary'|'event'>('home');
   const [level,setLevel] = useState(p.level);
   const [selected,setSelected] = useState<number[]>([]);
@@ -147,6 +150,111 @@ function App(){
     try { localStorage.setItem('word-bites-progress',JSON.stringify(safe)); } catch { setMessage('Progress could not be saved on this device.'); }
   };
   const commit=(patch:Partial<Progress>)=>save({...p,...patch});
+  useEffect(() => {
+  let active = true;
+
+  const initializeCloud = async () => {
+    try {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
+
+      if (sessionError) throw sessionError;
+
+      let session = sessionData.session;
+
+      if (!session) {
+        const { data, error } =
+          await supabase.auth.signInAnonymously();
+
+        if (error) throw error;
+        session = data.session;
+      }
+
+      if (!session?.user) {
+        throw new Error('No account session available');
+      }
+
+      if (!active) return;
+
+      setCloudUser(session.user);
+
+      const { data: row, error: readError } = await supabase
+        .from('player_progress')
+        .select('progress')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (readError) throw readError;
+
+      if (row?.progress) {
+        const restored = {
+          ...defaultProgress,
+          ...row.progress
+        } as Progress;
+
+        setP(restored);
+        localStorage.setItem(
+          'word-bites-progress',
+          JSON.stringify(restored)
+        );
+      } else {
+        const localProgress = load();
+
+        const { error: saveError } = await supabase
+          .from('player_progress')
+          .upsert({
+            user_id: session.user.id,
+            progress: localProgress
+          });
+
+        if (saveError) throw saveError;
+      }
+
+      if (!active) return;
+
+      setCloudReady(true);
+      setCloudStatus('Cloud sync active');
+    } catch (error) {
+      console.error('Word Bites cloud initialization failed:', error);
+
+      if (active) {
+        setCloudStatus('Offline — local save active');
+      }
+    }
+  };
+
+  initializeCloud();
+
+  return () => {
+    active = false;
+  };
+}, []);
+  useEffect(() => {
+  if (!cloudReady || !cloudUser) return;
+
+  const syncProgress = async () => {
+    try {
+      const { error } = await supabase
+        .from('player_progress')
+        .upsert({
+          user_id: cloudUser.id,
+          progress: p,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      setCloudStatus('Cloud sync active');
+    } catch (error) {
+      console.error('Word Bites cloud save failed:', error);
+      setCloudStatus('Sync pending — local save active');
+    }
+  };
+
+  const timer = window.setTimeout(syncProgress, 1000);
+
+  return () => window.clearTimeout(timer);
+}, [p, cloudUser, cloudReady]);
   const beep=(freq:number,duration=.08)=>{if(p.settings.muted)return;try{audio.current ||= new AudioContext();const o=audio.current.createOscillator();const g=audio.current.createGain();o.frequency.value=freq;o.connect(g);g.connect(audio.current.destination);g.gain.value=.035;o.start();o.stop(audio.current.currentTime+duration);}catch{}};
   const buzz=(strong=false)=>{if(p.settings.haptics && 'vibrate' in navigator)navigator.vibrate(strong?[30,30,60]:15);};
   const begin=(n:number,mode:'game'|'daily'='game',isTimed=false)=>{
