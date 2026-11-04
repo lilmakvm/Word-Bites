@@ -108,8 +108,110 @@ function related(a:string,b:string){ return a.length>2 && b.length>2 && (a.inclu
 function App(){
   const [p,setP] = useState<Progress>(load);
   const [cloudUser,setCloudUser] = useState<any>(null);
+  const [authMode,setAuthMode] = useState<'create'|'login'>('create');
+const [authEmail,setAuthEmail] = useState('');
+const [authPassword,setAuthPassword] = useState('');
+const [authBusy,setAuthBusy] = useState(false);
+const [authMessage,setAuthMessage] = useState('');
 const [cloudReady,setCloudReady] = useState(false);
 const [cloudStatus,setCloudStatus] = useState('Connecting...');
+  const handleCreateAccount = async () => {
+  if (!authEmail.trim() || authPassword.length < 8) {
+    setAuthMessage('Enter a valid email and a password of at least 8 characters.');
+    return;
+  }
+
+  setAuthBusy(true);
+  setAuthMessage('');
+
+  try {
+    if (cloudUser?.is_anonymous) {
+      const { data, error } = await supabase.auth.updateUser({
+        email: authEmail.trim(),
+        password: authPassword
+      });
+
+      if (error) throw error;
+
+      if (data.user) setCloudUser(data.user);
+
+      setAuthMessage(
+        'Account details submitted. Check your email to confirm your address.'
+      );
+    } else {
+      const { error } = await supabase.auth.signUp({
+        email: authEmail.trim(),
+        password: authPassword
+      });
+
+      if (error) throw error;
+
+      setAuthMessage('Check your email to confirm your new account.');
+    }
+  } catch (error: any) {
+    setAuthMessage(error.message || 'Account creation failed.');
+  } finally {
+    setAuthBusy(false);
+  }
+};
+
+const handleLogin = async () => {
+  if (!authEmail.trim() || !authPassword) {
+    setAuthMessage('Enter your email and password.');
+    return;
+  }
+
+  setAuthBusy(true);
+  setAuthMessage('');
+  setCloudReady(false);
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: authEmail.trim(),
+      password: authPassword
+    });
+
+    if (error) throw error;
+
+    setCloudUser(data.user);
+
+    const { data: row, error: readError } = await supabase
+      .from('player_progress')
+      .select('progress')
+      .eq('user_id', data.user.id)
+      .maybeSingle();
+
+    if (readError) throw readError;
+
+    if (row?.progress) {
+      const restored = {
+        ...defaultProgress,
+        ...row.progress
+      } as Progress;
+
+      setP(restored);
+      localStorage.setItem('word-bites-progress', JSON.stringify(restored));
+    } else {
+      const { error: saveError } = await supabase
+        .from('player_progress')
+        .upsert({
+          user_id: data.user.id,
+          progress: p
+        });
+
+      if (saveError) throw saveError;
+    }
+
+    setCloudReady(true);
+    setCloudStatus('Cloud sync active');
+    setAuthMessage('Successfully signed in. Your cloud progress is loaded.');
+  } catch (error: any) {
+    setAuthMessage(error.message || 'Login failed.');
+    setCloudStatus('Sync pending — local save active');
+  } finally {
+    setAuthBusy(false);
+  }
+};
   const [screen,setScreen] = useState<'home'|'game'|'daily'|'worlds'|'profile'|'achievements'|'settings'|'themes'|'dictionary'|'event'>('home');
   const [level,setLevel] = useState(p.level);
   const [selected,setSelected] = useState<number[]>([]);
@@ -495,7 +597,85 @@ const [cloudStatus,setCloudStatus] = useState('Connecting...');
   function SettingRow({icon,label,value,onClick}:{icon:React.ReactNode;label:string;value:boolean;onClick:()=>void}){return <button className="setting-row" onClick={onClick}><span>{icon} {label}</span><b>{value?'ON':'OFF'}</b></button>}
   const Themes=()=>{const items:[Theme,string,string,string][]=[['classic','☀️','Light Mode','Bright bakery · Fresh and classic'],['honey','🍯','Honey Gold','Warm cocoa · Golden highlights'],['emerald','💚','Emerald Green','Deep green · Premium glow'],['purple','💜','Electric Purple','Dark mode · Neon violet accents']];return <div className="sub-screen"><Nav title="Themes & Appearance"/><p className="theme-note">Choose an appearance. Every screen, game tile and menu updates together.</p><div className="theme-grid">{items.map(([id,icon,name,desc])=><button type="button" aria-pressed={p.theme===id} className={'theme-card theme-'+id+' '+(p.theme===id?'active':'')} key={id} onClick={()=>commit({theme:id})}><span className="theme-preview-icon">{icon}</span><b>{name}</b><small>{p.theme===id?'✓ Currently selected':'Tap to apply'}</small><em>{desc}</em></button>)}</div></div>};
   const Worlds=()=> <div className="sub-screen"><Nav title="Bakery Worlds"/>{WORLDS.map(([name,emoji,a,b])=>{const unlocked=p.level>=a;return <div className="world-card" key={name}><span>{emoji}</span><div><b>{name}</b><small>Levels {a+1}–{b+1}</small></div><button disabled={!unlocked} onClick={()=>begin(a)}>{unlocked?'Play':'🔒'}</button></div>})}</div>;
-  const Profile=()=> <div className="sub-screen"><Nav title="Profile & Stats"/><div className="profile-card">{mascot('👨‍🍳')}<h2>Word Bites Player</h2><p>Level {p.level+1} · 🔥 {p.streak} day streak</p></div><div className="stat-grid">{[['Levels',p.completed.length],['Words',p.wordsFound],['Bonus',p.bonus.length],['Longest',p.longest||'—'],['Best streak',p.bestStreak],['Coins',p.coins],['Perfect',p.perfect],['Event',p.eventWords]].map(([a,b])=><div key={String(a)}><b>{b}</b><span>{a}</span></div>)}</div><div className="account-card">☁️ <b>Word Bites Account</b><small>Level {p.level+1} · ⭐ {Object.values(p.stars).reduce((a,b)=>a+b,0)} · 🔥 {p.streak} · 🪙 {p.coins}</small><button onClick={()=>setMessage('Cloud accounts will preserve this profile across devices when enabled.')}>Cloud sync</button></div></div>;
+  const Profile = () => (
+  <div className="sub-screen">
+    <Nav title="Profile & Stats"/>
+
+    <div className="profile-card">
+      {mascot('👨‍🍳')}
+      <h2>Word Bites Player</h2>
+      <p>Level {p.level+1} · 🔥 {p.streak} day streak</p>
+    </div>
+
+    <div className="stat-grid">
+      {[
+        ['Levels',p.completed.length],
+        ['Words',p.wordsFound],
+        ['Bonus',p.bonus.length],
+        ['Longest',p.longest||'—'],
+        ['Best streak',p.bestStreak],
+        ['Coins',p.coins],
+        ['Perfect',p.perfect],
+        ['Event',p.eventWords]
+      ].map(([a,b])=>(
+        <div key={String(a)}>
+          <b>{b}</b>
+          <span>{a}</span>
+        </div>
+      ))}
+    </div>
+
+    <div className="account-card">
+      ☁️ <b>Word Bites Account</b>
+
+      <small>{cloudStatus}</small>
+
+      <small>
+        {cloudUser?.is_anonymous
+          ? 'Playing as guest. Create an account to keep your progress across devices.'
+          : cloudUser?.email || 'Connect an account to access your cloud progress.'}
+      </small>
+
+      <div className="auth-switch">
+        <button onClick={()=>{setAuthMode('create');setAuthMessage('');}}>
+          Create account
+        </button>
+        <button onClick={()=>{setAuthMode('login');setAuthMessage('');}}>
+          Log in
+        </button>
+      </div>
+
+      <input
+        type="email"
+        placeholder="Email address"
+        value={authEmail}
+        onChange={e=>setAuthEmail(e.target.value)}
+        autoComplete="email"
+      />
+
+      <input
+        type="password"
+        placeholder="Password (minimum 8 characters)"
+        value={authPassword}
+        onChange={e=>setAuthPassword(e.target.value)}
+        autoComplete={authMode==='login'?'current-password':'new-password'}
+      />
+
+      <button
+        disabled={authBusy}
+        onClick={authMode==='create'?handleCreateAccount:handleLogin}
+      >
+        {authBusy
+          ? 'Please wait...'
+          : authMode==='create'
+            ? 'Create my account'
+            : 'Log in'}
+      </button>
+
+      {authMessage && <small>{authMessage}</small>}
+    </div>
+  </div>
+);
   const Achievements=()=> <div className="sub-screen"><Nav title="Achievements"/>{[['🏆','First Word','Find your first word'],['🔥','10-Day Streak','Play 10 days in a row'],['🧠','100 Words Found','Discover 100 words'],['💎','50 Bonus Words','Find 50 bonus words'],['👑','Complete 100 Levels','Master 100 levels'],['⭐','Perfect Level','Finish with 3 stars'],['🎯','No Mistakes','Finish a puzzle with no invalid words']].map(([icon,name,desc])=><div className={'achievement '+(p.achievements.includes(name)|| (name==='No Mistakes'&&p.noMistakes>0)?'earned':'')} key={name}><span>{icon}</span><div><b>{name}</b><small>{desc}</small></div><span>{p.achievements.includes(name)||(name==='No Mistakes'&&p.noMistakes>0)?'✓':'🔒'}</span></div>)}</div>;
   const Dictionary=()=> <div className="sub-screen"><Nav title="Word Dictionary"/><div className="dictionary-intro">Tap discovered words during a puzzle to review them here.</div><div className="dictionary-list">{[...new Set(p.solved.map(x=>x.split(':')[1]).concat(p.bonus.map(x=>x.split(':')[1])))].slice(-80).reverse().map(w=><button key={w} onClick={()=>setDictionaryWord(w)}><b>{w}</b><small>{w.length} letters · discovered</small></button>)}</div>{dictionaryWord&&<div className="dictionary-pop"><button onClick={()=>setDictionaryWord('')}><X/></button><b>{dictionaryWord}</b><small>{dictionaryWord.length>=5?'Noun / verb — a discovered word worth remembering.':'Common word — keep exploring related forms.'}</small></div>}</div>;
     const Event=()=>{
