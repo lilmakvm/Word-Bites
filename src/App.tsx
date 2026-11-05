@@ -118,7 +118,10 @@ function App(){
   const authEmailRef = useRef<HTMLInputElement>(null);
   const authPasswordRef = useRef<HTMLInputElement>(null);
   const handleCreateAccount = async () => {
-  if (!authEmail.trim() || authPassword.length < 8) {
+  const email = authEmailRef.current?.value.trim() || '';
+  const password = authPasswordRef.current?.value || '';
+
+  if (!email || !email.includes('@') || password.length < 8) {
     setAuthMessage('Enter a valid email and a password of at least 8 characters.');
     return;
   }
@@ -129,8 +132,8 @@ function App(){
   try {
     if (cloudUser?.is_anonymous) {
       const { data, error } = await supabase.auth.updateUser({
-        email: authEmail.trim(),
-        password: authPassword
+        email,
+        password
       });
 
       if (error) throw error;
@@ -141,14 +144,16 @@ function App(){
         'Account details submitted. Check your email to confirm your address.'
       );
     } else {
-      const { error } = await supabase.auth.signUp({
-        email: authEmail.trim(),
-        password: authPassword
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password
       });
 
       if (error) throw error;
 
-      setAuthMessage('Check your email to confirm your new account.');
+      setAuthMessage(
+        'Account created. Check your email to confirm your address.'
+      );
     }
   } catch (error: any) {
     setAuthMessage(error.message || 'Account creation failed.');
@@ -158,7 +163,10 @@ function App(){
 };
 
 const handleLogin = async () => {
-  if (!authEmail.trim() || !authPassword) {
+  const email = authEmailRef.current?.value.trim() || '';
+  const password = authPasswordRef.current?.value || '';
+
+  if (!email || !password) {
     setAuthMessage('Enter your email and password.');
     return;
   }
@@ -169,8 +177,8 @@ const handleLogin = async () => {
 
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: authEmail.trim(),
-      password: authPassword
+      email,
+      password
     });
 
     if (error) throw error;
@@ -192,7 +200,10 @@ const handleLogin = async () => {
       } as Progress;
 
       setP(restored);
-      localStorage.setItem('word-bites-progress', JSON.stringify(restored));
+      localStorage.setItem(
+        'word-bites-progress',
+        JSON.stringify(restored)
+      );
     } else {
       const { error: saveError } = await supabase
         .from('player_progress')
@@ -673,15 +684,23 @@ const Profile = () => (
       />
 
       <button
-        disabled={authBusy}
-        onClick={authMode==='create'?handleCreateAccount:handleLogin}
-      >
-        {authBusy
-          ? 'Please wait...'
-          : authMode==='create'
-            ? 'Create my account'
-            : 'Log in'}
-      </button>
+  type="button"
+  disabled={authBusy}
+  onClick={() => {
+    console.log('Word Bites account button clicked');
+    if (authMode === 'create') {
+      handleCreateAccount();
+    } else {
+      handleLogin();
+    }
+  }}
+>
+  {authBusy
+    ? 'Please wait...'
+    : authMode === 'create'
+      ? 'Create my account'
+      : 'Log in'}
+</button>
 
       {authMessage && <small>{authMessage}</small>}
     </div>
