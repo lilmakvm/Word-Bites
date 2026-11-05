@@ -104,17 +104,19 @@ function load():Progress {
 function weekEvent(){ return Math.floor(Date.now()/86400000/7); }
 function eventGoal(){ return 50 + (weekEvent()%3)*25; }
 function related(a:string,b:string){ return a.length>2 && b.length>2 && (a.includes(b) || b.includes(a) || [...a].sort().join('') === [...b].sort().join('')); }
-
 function App(){
   const [p,setP] = useState<Progress>(load);
+
   const [cloudUser,setCloudUser] = useState<any>(null);
   const [authMode,setAuthMode] = useState<'create'|'login'>('create');
-const [authEmail,setAuthEmail] = useState('');
-const [authPassword,setAuthPassword] = useState('');
-const [authBusy,setAuthBusy] = useState(false);
-const [authMessage,setAuthMessage] = useState('');
-const [cloudReady,setCloudReady] = useState(false);
-const [cloudStatus,setCloudStatus] = useState('Connecting...');
+  const [authBusy,setAuthBusy] = useState(false);
+  const [authMessage,setAuthMessage] = useState('');
+
+  const [cloudReady,setCloudReady] = useState(false);
+  const [cloudStatus,setCloudStatus] = useState('Connecting...');
+
+  const authEmailRef = useRef<HTMLInputElement>(null);
+  const authPasswordRef = useRef<HTMLInputElement>(null);
   const handleCreateAccount = async () => {
   if (!authEmail.trim() || authPassword.length < 8) {
     setAuthMessage('Enter a valid email and a password of at least 8 characters.');
