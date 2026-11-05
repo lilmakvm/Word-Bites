@@ -597,7 +597,7 @@ const handleLogin = async () => {
   function SettingRow({icon,label,value,onClick}:{icon:React.ReactNode;label:string;value:boolean;onClick:()=>void}){return <button className="setting-row" onClick={onClick}><span>{icon} {label}</span><b>{value?'ON':'OFF'}</b></button>}
   const Themes=()=>{const items:[Theme,string,string,string][]=[['classic','☀️','Light Mode','Bright bakery · Fresh and classic'],['honey','🍯','Honey Gold','Warm cocoa · Golden highlights'],['emerald','💚','Emerald Green','Deep green · Premium glow'],['purple','💜','Electric Purple','Dark mode · Neon violet accents']];return <div className="sub-screen"><Nav title="Themes & Appearance"/><p className="theme-note">Choose an appearance. Every screen, game tile and menu updates together.</p><div className="theme-grid">{items.map(([id,icon,name,desc])=><button type="button" aria-pressed={p.theme===id} className={'theme-card theme-'+id+' '+(p.theme===id?'active':'')} key={id} onClick={()=>commit({theme:id})}><span className="theme-preview-icon">{icon}</span><b>{name}</b><small>{p.theme===id?'✓ Currently selected':'Tap to apply'}</small><em>{desc}</em></button>)}</div></div>};
   const Worlds=()=> <div className="sub-screen"><Nav title="Bakery Worlds"/>{WORLDS.map(([name,emoji,a,b])=>{const unlocked=p.level>=a;return <div className="world-card" key={name}><span>{emoji}</span><div><b>{name}</b><small>Levels {a+1}–{b+1}</small></div><button disabled={!unlocked} onClick={()=>begin(a)}>{unlocked?'Play':'🔒'}</button></div>})}</div>;
-  const Profile = () => (
+const Profile = () => (
   <div className="sub-screen">
     <Nav title="Profile & Stats"/>
 
@@ -637,27 +637,36 @@ const handleLogin = async () => {
       </small>
 
       <div className="auth-switch">
-        <button onClick={()=>{setAuthMode('create');setAuthMessage('');}}>
+        <button
+          onClick={()=>{
+            setAuthMode('create');
+            setAuthMessage('');
+          }}
+        >
           Create account
         </button>
-        <button onClick={()=>{setAuthMode('login');setAuthMessage('');}}>
+
+        <button
+          onClick={()=>{
+            setAuthMode('login');
+            setAuthMessage('');
+          }}
+        >
           Log in
         </button>
       </div>
 
       <input
+        ref={authEmailRef}
         type="email"
         placeholder="Email address"
-        value={authEmail}
-        onChange={e=>setAuthEmail(e.target.value)}
         autoComplete="email"
       />
 
       <input
+        ref={authPasswordRef}
         type="password"
         placeholder="Password (minimum 8 characters)"
-        value={authPassword}
-        onChange={e=>setAuthPassword(e.target.value)}
         autoComplete={authMode==='login'?'current-password':'new-password'}
       />
 
